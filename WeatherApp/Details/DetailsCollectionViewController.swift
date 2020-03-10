@@ -9,16 +9,31 @@
 import UIKit
 
 
+struct Details {
+    var title: String
+    var value: String
+    var image: String?
+}
+
 class DetailsCollectionViewController: UICollectionViewController, UICollectionViewDelegateFlowLayout {
-    let model: [DetailsModel] = [DetailsModel(image: UIImage.init(named: "temp")!, title: "Feels like", value: " 22°"),
-                                 DetailsModel(image: UIImage.init(named: "eye")!, title: "Visability", value: " 10 km"),
-                                 DetailsModel(image: UIImage.init(named: "meter")!, title: "Pressure", value: "1011"),
-                                 DetailsModel(image: UIImage.init(named: "humidity")!, title: "Humidity", value: "25 %"),
-                                 DetailsModel(image: UIImage.init(named: "wind")!, title: "Wind", value: " 2 km/h")]
+    var model: [Details]!
     
-    
-    convenience init () {
+    convenience init (forecast: Forecast) {
         self.init(collectionViewLayout: UICollectionViewFlowLayout())
+        
+        
+        initializeModel(from: forecast)
+    }
+    
+    
+    private func initializeModel(from forecast: Forecast) {
+        model = [Details]()
+        
+        model.append(Details(title: "Feels like", value: "\(forecast.feelsLike)°", image: AssetHelper.tempImageName))
+        model.append(Details(title: "Wind", value: "\(forecast.wind)km/h", image: AssetHelper.windImageName))
+        model.append(Details(title: "Humidity", value: "\(forecast.humidity)%", image: AssetHelper.humidityImageName))
+        model.append(Details(title: "Pressure", value: "\(forecast.pressure)", image: AssetHelper.pressureImageName))
+        model.append(Details(title: "Visability", value:"\(forecast.visability)", image: AssetHelper.visabilityImageName))
     }
     
     override func viewDidLoad() {
@@ -38,7 +53,6 @@ class DetailsCollectionViewController: UICollectionViewController, UICollectionV
             fatalError()
         }
         
-                
         cell.setupCell(detailsModel: model[indexPath.row])
         
         return cell

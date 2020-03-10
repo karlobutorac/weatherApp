@@ -22,8 +22,11 @@ class DetailsCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    public func setupCell(detailsModel: DetailsModel) {
-        image.image = detailsModel.image.withRenderingMode(.alwaysTemplate)
+    public func setupCell(detailsModel: Details) {
+        if let imageName = detailsModel.image {
+            image.image = UIImage.init(named: imageName)?.withRenderingMode(.alwaysTemplate)
+        }
+        
         titleLabel.text = detailsModel.title
         valueLabel.text = detailsModel.value
     }

@@ -10,28 +10,26 @@ import UIKit
 
 
 class WeatherCoordinator: Coordinator {
+    var datasource: Datasource
     var childCoordinators: [Coordinator] = []
-    var model: PlaceModel!
-    weak var delegate: PlacesControllerDelegate?
+    var model: Forecast!
+    weak var delegate: ForecastsControllerDelegate?
 
     unowned let navigationController: UINavigationController
+
     
-    
-    required init(navigationController: UINavigationController) {
+    required init(navigationController: UINavigationController, datasource: Datasource) {
         self.navigationController = navigationController
+        self.datasource = datasource
     }
     
     func start() {
         let weatherController: WeatherController = WeatherController(model: model)
         weatherController.delegate = self
         weatherController.modalPresentationStyle = .overFullScreen
-//        weatherController.transitioningDelegate = transitionDelegate
         
-        self.navigationController.present(weatherController, animated: true, completion: nil)
-    }
-    
-
-    
+        self.navigationController.present(weatherController, animated: false, completion: nil)
+    } 
 }
 
 extension WeatherCoordinator: WeatherControllerDelegate {

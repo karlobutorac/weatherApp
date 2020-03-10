@@ -13,7 +13,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
 
     
-    var placesCoordinator: PlacesCoordinator?
+    var forecastsCoordinator: ForecastsCoordinator?
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
@@ -26,9 +26,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         window?.rootViewController =  UINavigationController()
         setupNavigationController(navigationController: window?.rootViewController as! UINavigationController)
-
-        placesCoordinator = PlacesCoordinator(navigationController: window?.rootViewController as! UINavigationController)
-        placesCoordinator?.start()
+        
+        forecastsCoordinator = ForecastsCoordinator(navigationController: window?.rootViewController as! UINavigationController, datasource:  DatasourceManager.shared)
+        forecastsCoordinator?.start()
         
         window?.makeKeyAndVisible()
     }

@@ -21,6 +21,22 @@ extension UIColor {
     static let osijekColors  = [UIColor(red: 188, green: 163, blue: 214).cgColor, UIColor(red: 173, green: 136, blue: 183).cgColor,  UIColor(red: 94, green: 94, blue: 144).cgColor]
 
     
+    //TODO: Nes ljepse smislit
+    public static func getColorScheme(for id: Int) -> [CGColor] {
+        switch id {
+        case 3186886:
+            return zagrebColors
+        case 3191648:
+            return rijekaColors
+        case 3193935:
+            return splitColors
+        case 3190261:
+            return osijekColors
+        default:
+            return zagrebColors
+        }
+    }
+    
     // Create a UIColor from RGB
     convenience init(red: Int, green: Int, blue: Int, a: CGFloat = 1.0) {
         self.init(

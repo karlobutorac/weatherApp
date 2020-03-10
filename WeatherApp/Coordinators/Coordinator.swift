@@ -10,10 +10,11 @@ import Foundation
 import UIKit
 
 
-public protocol Coordinator: class {
+protocol Coordinator: class {
     var childCoordinators: [Coordinator] { get set }
+    var datasource: Datasource { get set }
     
-    init(navigationController: UINavigationController)
+    init(navigationController: UINavigationController, datasource: Datasource)
     
     func start()
 }

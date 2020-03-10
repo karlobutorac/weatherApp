@@ -10,21 +10,21 @@ import Foundation
 
 
 struct NetworkResponse: Codable {
-    var cod: String
-    var message: Int
     var cnt: Int
-    var list: [Forecast]
-    var city: City
+    var list: [JSONForecast]
 }
 
-struct Forecast: Codable {
-    var dt: Int
-    var main: Summery
-    var weather: [Weather]
-    var clouds: Clouds
-    var wind: Wind
+struct JSONForecast: Codable {
+    var coord: Coordinates
     var sys: Sys
-    var dt_txt: String
+    var weather: [Weather]
+    var main: Summery
+    var visibility: Int
+    var wind: Wind
+    var clouds: Clouds
+    var dt: Int
+    var id: Int
+    var name: String
 }
 
 struct Summery: Codable {
@@ -33,10 +33,7 @@ struct Summery: Codable {
     var minTemp: Double
     var maxTemp: Double
     var pressure: Int
-    var seaLevel: Int
-    var groundLevel: Int
     var humidity: Int
-    var tempKf: Double
     
     enum CodingKeys: String, CodingKey {
         case currentTemp = "temp"
@@ -44,10 +41,7 @@ struct Summery: Codable {
         case minTemp = "temp_min"
         case maxTemp = "temp_max"
         case pressure
-        case seaLevel = "sea_level"
-        case groundLevel = "grnd_level"
         case humidity
-        case tempKf = "temp_kf"
     }
 }
 
@@ -64,17 +58,10 @@ struct Clouds: Codable {
 
 struct Wind: Codable {
     var speed: Double
-    var deg: Int
+//    var deg: Int
 }
 
 struct Sys: Codable {
-    var pod: String
-}
-
-struct City: Codable {
-    var id: Int
-    var name: String
-    var coord: Coordinates
     var country: String
     var timezone: Int
     var sunrise: Int
