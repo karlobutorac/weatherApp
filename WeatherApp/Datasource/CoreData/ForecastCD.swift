@@ -21,5 +21,5 @@ public class ForecastCD: NSManagedObject, Identifiable {
     @NSManaged public var wind: Int
     @NSManaged public var humidity: Int
     @NSManaged public var pressure: Int
-    @NSManaged public var visability: Int
+    @NSManaged public var visibility: Int
 }

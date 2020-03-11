@@ -20,7 +20,7 @@ public struct Forecast {
     var wind: Int
     var humidity: Int
     var pressure: Int
-    var visability: Int
+    var visibility: Int
     
     internal static func createArray(from jsonForecasts: [JSONForecast]) -> [Forecast]{
         var list = [Forecast]()
@@ -54,7 +54,7 @@ public struct Forecast {
         self.wind = Int(jsonForecast.wind.speed)
         self.humidity = jsonForecast.main.humidity
         self.pressure = jsonForecast.main.pressure
-        self.visability = jsonForecast.visibility
+        self.visibility = jsonForecast.visibility
     }
     
     init (coreDataForecast: ForecastCD) {
@@ -68,7 +68,7 @@ public struct Forecast {
         self.wind = coreDataForecast.wind
         self.humidity = coreDataForecast.humidity
         self.pressure = coreDataForecast.pressure
-        self.visability = coreDataForecast.visability
+        self.visibility = coreDataForecast.visibility
 
     }
 }

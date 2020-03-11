@@ -23,13 +23,6 @@ class DatasourceManager: Datasource {
     }
     
     func getWeatherForecasts(for ids: [Int], completion: @escaping (DatabaseQueryResult<[Forecast]>) -> Void) {
-        let coreDataResult = CoreDataDatasource.shared.getAllForecasts()
-        
-        if case .success(let coreDataForecasts) = coreDataResult, coreDataForecasts.count != 0 {
-            completion(DatabaseQueryResult.success(result: Forecast.createArray(from: coreDataForecasts)))
-            return
-        }
-        
         NetworkDatasource.shared.getWeatherDetails(for: ids) { forecastNetworkResult in
             switch forecastNetworkResult {
             case .success(let jsonForecasts):
@@ -38,20 +31,19 @@ class DatasourceManager: Datasource {
                 completion(DatabaseQueryResult<[Forecast]>.success(result: Forecast.createArray(from: jsonForecasts)))
                 
             case .failure(let error):
-                completion(DatabaseQueryResult.failure(error: error))
+                let coreDataResult = CoreDataDatasource.shared.getAllForecasts()
+                
+                if case .success(let coreDataForecasts) = coreDataResult, coreDataForecasts.count != 0 {
+                    completion(DatabaseQueryResult.success(result: Forecast.createArray(from: coreDataForecasts)))
+                    return
+                } else {
+                    completion(DatabaseQueryResult.failure(error: error))
+                }
             }
         }
     }
     
     func getAllWeatherForecasts(completion: @escaping (DatabaseQueryResult<[Forecast]>) -> Void) {
-        
-        let coreDataResult = CoreDataDatasource.shared.getAllForecasts()
-        
-        if case .success(let coreDataForecasts) = coreDataResult, coreDataForecasts.count != 0 {
-            completion(DatabaseQueryResult.success(result: Forecast.createArray(from: coreDataForecasts)))
-            return
-        }
-        
         NetworkDatasource.shared.getWeatherDetails(for: getAllMyForecastsIds()) { forecastNetworkResult in
             switch forecastNetworkResult {
             case .success(let jsonForecasts):
@@ -60,7 +52,14 @@ class DatasourceManager: Datasource {
                 completion(DatabaseQueryResult<[Forecast]>.success(result: Forecast.createArray(from: jsonForecasts)))
                 
             case .failure(let error):
-                completion(DatabaseQueryResult.failure(error: error))
+                let coreDataResult = CoreDataDatasource.shared.getAllForecasts()
+                
+                if case .success(let coreDataForecasts) = coreDataResult, coreDataForecasts.count != 0 {
+                    completion(DatabaseQueryResult.success(result: Forecast.createArray(from: coreDataForecasts)))
+                    return
+                } else {
+                    completion(DatabaseQueryResult.failure(error: error))
+                }
             }
         }
     }

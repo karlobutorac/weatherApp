@@ -8,7 +8,6 @@
 
 import UIKit
 
-
 struct Details {
     var title: String
     var value: String
@@ -33,7 +32,7 @@ class DetailsCollectionViewController: UICollectionViewController, UICollectionV
         model.append(Details(title: "Wind", value: "\(forecast.wind)km/h", image: AssetHelper.windImageName))
         model.append(Details(title: "Humidity", value: "\(forecast.humidity)%", image: AssetHelper.humidityImageName))
         model.append(Details(title: "Pressure", value: "\(forecast.pressure)", image: AssetHelper.pressureImageName))
-        model.append(Details(title: "Visability", value:"\(forecast.visability)", image: AssetHelper.visabilityImageName))
+        model.append(Details(title: "visibility", value:"\(forecast.visibility)", image: AssetHelper.visibilityImageName))
     }
     
     override func viewDidLoad() {

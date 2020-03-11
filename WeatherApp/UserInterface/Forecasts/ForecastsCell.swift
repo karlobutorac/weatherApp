@@ -31,8 +31,6 @@ class ForecastsCell: UICollectionViewCell {
         self.minTempLabel.text = "\(forecastsModel.minTemp)°"
     }
     
-    
-    
     func setupViews(){
         setupCellCorners()
         

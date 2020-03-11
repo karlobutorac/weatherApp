@@ -15,5 +15,5 @@ class AssetHelper {
     public static let windImageName = "wind"
     public static let humidityImageName = "humidity"
     public static let pressureImageName = "meter"
-    public static let visabilityImageName = "eye" 
+    public static let visibilityImageName = "eye" 
 }

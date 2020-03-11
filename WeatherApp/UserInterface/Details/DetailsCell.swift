@@ -6,7 +6,6 @@
 //  Copyright © 2020 Karlo Butorac. All rights reserved.
 //
 
-
 import UIKit
 
 class DetailsCell: UICollectionViewCell {
