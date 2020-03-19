@@ -13,7 +13,7 @@ class WeatherCoordinator: Coordinator {
     var datasource: Datasource
     var childCoordinators: [Coordinator] = []
     var model: Forecast!
-    weak var delegate: ForecastsControllerDelegate?
+    weak var delegate: ForecastListControllerDelegate?
 
     unowned let navigationController: UINavigationController
 
@@ -24,15 +24,17 @@ class WeatherCoordinator: Coordinator {
     }
     
     func start() {
-        let weatherController: WeatherController = WeatherController(model: model)
-        weatherController.delegate = self
-        weatherController.modalPresentationStyle = .overFullScreen
-        
-        self.navigationController.present(weatherController, animated: false, completion: nil)
+        let weatherForecastController: WeatherForecastController =
+            WeatherForecastController(datasource: datasource, cityId: model.id, forecast: model)
+          
+        weatherForecastController.delegate = self
+        weatherForecastController.modalPresentationStyle = .overFullScreen
+
+        self.navigationController.present(weatherForecastController, animated: false, completion: nil)
     } 
 }
 
-extension WeatherCoordinator: WeatherControllerDelegate {
+extension WeatherCoordinator: WeatherForecastControllerDelegate {
     func dismiss() {
         navigationController.dismiss(animated: true, completion: nil)
     }

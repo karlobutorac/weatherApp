@@ -10,5 +10,5 @@ import Foundation
 import UIKit
 
 protocol AnimatedTransition {
-    func animateTransition(for indexPath: IndexPath, completion: @escaping (Bool) -> Void)
+    func animateTransition(for indexPath: IndexPath, forecastCellViewModel: ForecastCellViewModel ,completion: @escaping (Bool) -> Void)
 }

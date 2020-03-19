@@ -1,5 +1,5 @@
 //
-//  WeatherControllerDelegate.swift
+//  ForecastListControllerDelegate.swift
 //  WeatherApp
 //
 //  Created by Karlo Butorac on 02/03/2020.
@@ -9,6 +9,6 @@
 import Foundation
 
 
-public protocol WeatherControllerDelegate: class {
-    func dismiss()
+public protocol ForecastListControllerDelegate: class {
+    func didSelect(model: Forecast)
 }

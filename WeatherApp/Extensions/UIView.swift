@@ -9,13 +9,6 @@
 import UIKit
 
 extension UIView {
-    func copyView<T: UIView>() -> T {
-        return try! NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(NSKeyedArchiver.archivedData(withRootObject: self, requiringSecureCoding: false)) as! T
-    }
-}
-
-
-extension UIView {
     func fadeTo(_ alpha: CGFloat, duration: TimeInterval = 0.25) {
         DispatchQueue.main.async {
             UIView.animate(withDuration: duration) {
