@@ -42,6 +42,31 @@ public struct Forecast {
         return list
     }
     
+    func getDetails() -> [Details] {
+        var details = [Details]()
+        
+        details.append(Details.feelsLike(feelsLike))
+        details.append(Details.wind(wind))
+        details.append(Details.humidity(humidity))
+        details.append(Details.pressure(pressure))
+        details.append(Details.visibility(visibility))
+        
+        return details
+    }
+    
+    init (cityId: Int) {
+        self.name = ""
+        self.currentTemp = 0
+        self.maxTemp = 0
+        self.minTemp = 0
+        self.id = cityId
+        self.colorScheme = UIColor.getColorScheme(for: id)
+        self.feelsLike = 0
+        self.wind = 0
+        self.humidity = 0
+        self.pressure = 0
+        self.visibility = 0
+    }
     
     init (jsonForecast: JSONForecast) {
         self.name = jsonForecast.name
@@ -59,10 +84,10 @@ public struct Forecast {
     
     init (coreDataForecast: ForecastCD) {
         self.name = coreDataForecast.name
-        self.id = coreDataForecast.id.hashValue
+        self.id = coreDataForecast.id
         self.currentTemp = coreDataForecast.currentTemp
-        self.maxTemp = coreDataForecast.currentTemp
-        self.minTemp = coreDataForecast.currentTemp
+        self.maxTemp = coreDataForecast.maxTemp
+        self.minTemp = coreDataForecast.minTemp
         self.colorScheme = UIColor.getColorScheme(for: coreDataForecast.id)
         self.feelsLike = coreDataForecast.feelsLike
         self.wind = coreDataForecast.wind

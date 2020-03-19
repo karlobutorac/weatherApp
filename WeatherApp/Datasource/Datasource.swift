@@ -18,4 +18,5 @@ protocol Datasource {
     func getMyForecastsCount() -> Int
     func getAllWeatherForecasts(completion: @escaping (DatabaseQueryResult<[Forecast]>) -> Void)
     func getWeatherForecasts(for ids: [Int], completion: @escaping (DatabaseQueryResult<[Forecast]>) -> Void)
+    func getWeatherForecast(for id: Int, completion: @escaping (DatabaseQueryResult<Forecast>) -> Void)
 }

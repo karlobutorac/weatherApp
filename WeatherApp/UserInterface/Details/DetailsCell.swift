@@ -10,7 +10,7 @@ import UIKit
 
 class DetailsCell: UICollectionViewCell {
     static let identifier = "DetailsCellId"
-    
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         
@@ -21,14 +21,13 @@ class DetailsCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    public func setupCell(detailsModel: Details) {
-        if let imageName = detailsModel.image {
-            image.image = UIImage.init(named: imageName)?.withRenderingMode(.alwaysTemplate)
-        }
+    public func setupCell(detailsModel: DetailsCellViewModel) {
         
+        image.image = detailsModel.image
         titleLabel.text = detailsModel.title
         valueLabel.text = detailsModel.value
     }
+    
     
     private func setupViews() {
         setupCellCorners()
