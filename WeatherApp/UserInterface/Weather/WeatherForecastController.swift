@@ -1,5 +1,5 @@
 //
-//  WeatherController.swift
+//  WeatherForecastController.swift
 //  WeatherApp
 //
 //  Created by Karlo Butorac on 02/03/2020.
@@ -8,22 +8,33 @@
 
 import Foundation
 import UIKit
+import RxSwift
+import RxCocoa
 
-class WeatherController: UIViewController {
+
+class WeatherForecastController: UIViewController {
+    private let disposeBag = DisposeBag()
     public weak var delegate: WeatherCoordinator?
-    public var model: Forecast!
     
-    convenience init(model: Forecast) {
+    var datasource: Datasource!
+    var cityId: Int!
+    var forecast: Forecast!
+    var weatherForecastViewModel: WeatherForecastViewModel!
+    
+    convenience init(datasource: Datasource, cityId: Int, forecast: Forecast) {
         self.init(nibName: nil, bundle: nil)
         
-        self.model = model
+        self.datasource = datasource
+        self.cityId = cityId
+        
+        self.weatherForecastViewModel = WeatherForecastViewModel(datasource: datasource, cityId: cityId, forecast: forecast)
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         setupViews()
-        setupContent()
+        bindContent()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -32,22 +43,47 @@ class WeatherController: UIViewController {
         dismissButton.fadeIn()
         detailsView.fadeIn()
         detailsLabel.fadeIn()
-        detailCollectionView.collectionView.fadeIn()
+        detailCollectionView.view.fadeIn()
     }
     
     @objc private func dismissButtonClicked() {
         delegate?.dismiss()
     }
     
-    private func setupContent() {
-        view.layer.configureGradientBackground(colors: model.colorScheme!)
+    private func bindContent() {
+    
+        weatherForecastViewModel.colorScheme
+            .subscribe { colors in
+            self.view.layer.configureGradientBackground(colors: colors.element!)
+        }.disposed(by: disposeBag)
         
-        self.nameLabel.text = model.name
-        self.currentTempLabel.text = "\(model.currentTemp)°"
-        self.maxTempLabel.text = "\(model.maxTemp)°"
-        self.minTempLabel.text = "\(model.minTemp)°"
+        weatherForecastViewModel.name
+            .asObserver()
+            .bind(to: self.nameLabel.rx.text)
+            .disposed(by: disposeBag)
         
-        dismissButton.addTarget(self, action: #selector(dismissButtonClicked), for: .touchUpInside)
+        weatherForecastViewModel.currentTemp
+            .asObservable()
+            .bind(to: self.currentTempLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        weatherForecastViewModel.minTemp
+            .asObserver()
+            .bind(to: self.minTempLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        weatherForecastViewModel.maxTemp
+            .asObserver()
+            .bind(to: self.maxTempLabel.rx.text)
+            .disposed(by: disposeBag)
+        
+        
+        dismissButton.rx.tap.bind { _ in
+            self.dismissButtonClicked()
+        }.disposed(by: disposeBag)
+        
+        
+        
     }
     
     private func setupViews() {
@@ -59,7 +95,7 @@ class WeatherController: UIViewController {
         view.addSubview(dismissButton)
         view.addSubview(detailsLabel)
         view.addSubview(detailsView)
-        view.addSubview(detailCollectionView.collectionView)
+        view.addSubview(detailCollectionView.view)
         
         dismissButton.topAnchor.constraint(equalTo: view.topAnchor, constant: CGFloat(view.topSafeAreaConstantHelper + 10)).isActive = true
         dismissButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20).isActive = true
@@ -91,16 +127,16 @@ class WeatherController: UIViewController {
         detailsView.heightAnchor.constraint(equalToConstant: 1).isActive = true
         detailsView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20).isActive = true
         
-        detailCollectionView.collectionView.topAnchor.constraint(equalTo: detailsView.bottomAnchor, constant: 20).isActive = true
-        detailCollectionView.collectionView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20).isActive = true
-        detailCollectionView.collectionView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20).isActive = true
-        detailCollectionView.collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -10).isActive = true
+        detailCollectionView.view.topAnchor.constraint(equalTo: detailsView.bottomAnchor, constant: 20).isActive = true
+        detailCollectionView.view.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20).isActive = true
+        detailCollectionView.view.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20).isActive = true
+        detailCollectionView.view.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -10).isActive = true
     }
     
     let nameLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = ""
+        label.text = " "
         label.font = UIFont.systemFont(ofSize: 40, weight: .thin)
         label.textColor = .white
         return label
@@ -109,7 +145,7 @@ class WeatherController: UIViewController {
     let currentTempLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = ""
+        label.text = " "
         label.font = UIFont.systemFont(ofSize: 90, weight: .ultraLight)
         label.textColor = .white
         return label
@@ -118,7 +154,7 @@ class WeatherController: UIViewController {
     let maxTempLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = ""
+        label.text = " "
         label.font = UIFont.systemFont(ofSize: 25, weight: .thin)
         label.textColor = .white
         return label
@@ -127,7 +163,7 @@ class WeatherController: UIViewController {
     let minTempLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = ""
+        label.text = " "
         label.font = UIFont.systemFont(ofSize: 25, weight: .thin)
         label.textColor = .white
         return label
@@ -170,10 +206,11 @@ class WeatherController: UIViewController {
         return view
     }()
     
-    lazy var detailCollectionView: DetailsCollectionViewController = {
-        let cv = DetailsCollectionViewController(forecast: model)
-        cv.collectionView.alpha = 0.0
-        cv.collectionView.translatesAutoresizingMaskIntoConstraints = false
-        return cv
+
+    lazy var detailCollectionView: UIViewController =  {
+        let details = DetailsCollectionViewController(datasource: datasource, cityId: cityId, forecast: weatherForecastViewModel.forecast.value)
+        details.view.backgroundColor = .clear
+        details.view.translatesAutoresizingMaskIntoConstraints = false
+        return details
     }()
 }

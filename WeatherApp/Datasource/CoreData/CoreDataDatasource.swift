@@ -75,7 +75,7 @@ class CoreDataDatasource {
     
     func getForecast(for id: Int) -> ForecastCoreDataResult<ForecastCD> {
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "ForecastCD")
-        fetchRequest.predicate = NSPredicate(format: "id = %@", id)
+        fetchRequest.predicate = NSPredicate(format: "id == %d", id)
         
         do {
             let result = try managedContext.fetch(fetchRequest)

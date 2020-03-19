@@ -10,7 +10,12 @@ import UIKit
 
 extension CALayer {
     
-    public func configureGradientBackground(colors: [CGColor]){
+    public func configureGradientBackground(colors: [CGColor]?){
+        guard let colors = colors else {
+            print("Gradient colors are nil")
+            return
+        }
+        
         let gradient = CAGradientLayer()
 
         let maxWidth = max(self.bounds.size.height,self.bounds.size.width)

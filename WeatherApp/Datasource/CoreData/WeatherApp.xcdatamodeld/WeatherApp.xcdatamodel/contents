@@ -19,6 +19,6 @@
         </uniquenessConstraints>
     </entity>
     <elements>
-        <element name="ForecastCD" positionX="-63" positionY="-18" width="128" height="208"/>
+        <element name="ForecastCD" positionX="-63" positionY="0" width="128" height="208"/>
     </elements>
 </model>

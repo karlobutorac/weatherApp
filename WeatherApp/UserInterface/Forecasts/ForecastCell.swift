@@ -7,8 +7,11 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
 
-class ForecastsCell: UICollectionViewCell {
+
+class ForecastCell: UICollectionViewCell {
     static let identifier = "ForecastsCellId"
     var nameLabelTopAchor: NSLayoutConstraint?
 
@@ -22,13 +25,13 @@ class ForecastsCell: UICollectionViewCell {
         super.init(coder: aDecoder)
     }
     
-    func setupCell(forecastsModel: Forecast) {
-        self.layer.configureGradientBackground(colors: forecastsModel.colorScheme!)
+    func setupCell(forecastCellViewModel: ForecastCellViewModel) {
+        self.layer.configureGradientBackground(colors: forecastCellViewModel.colorScheme)
         
-        self.nameLabel.text = forecastsModel.name
-        self.currentTempLabel.text = "\(forecastsModel.currentTemp)°"
-        self.maxTempLabel.text = "\(forecastsModel.maxTemp)°"
-        self.minTempLabel.text = "\(forecastsModel.minTemp)°"
+        self.nameLabel.text = forecastCellViewModel.name
+        self.currentTempLabel.text = forecastCellViewModel.currentTemp
+        self.maxTempLabel.text = forecastCellViewModel.maxTemp
+        self.minTempLabel.text = forecastCellViewModel.minTemp
     }
     
     func setupViews(){
@@ -71,7 +74,6 @@ class ForecastsCell: UICollectionViewCell {
     let nameLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = ""
         label.font = UIFont.systemFont(ofSize: 40, weight: .thin)
         label.textColor = .white
         return label
@@ -80,7 +82,6 @@ class ForecastsCell: UICollectionViewCell {
     let currentTempLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = ""
         label.font = UIFont.systemFont(ofSize: 90, weight: .ultraLight)
         label.textColor = .white
         return label
@@ -89,7 +90,6 @@ class ForecastsCell: UICollectionViewCell {
     let maxTempLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = ""
         label.font = UIFont.systemFont(ofSize: 25, weight: .thin)
         label.textColor = .white
         return label
@@ -98,7 +98,6 @@ class ForecastsCell: UICollectionViewCell {
     let minTempLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = ""
         label.font = UIFont.systemFont(ofSize: 25, weight: .thin)
         label.textColor = .white
         return label

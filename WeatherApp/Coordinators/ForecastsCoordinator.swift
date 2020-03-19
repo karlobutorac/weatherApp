@@ -21,15 +21,15 @@ class ForecastsCoordinator: Coordinator {
     }
     
     func start() {
-        let forecastsController: ForecastsController = ForecastsController(datasource: datasource)
-        forecastsController.delegate = self
+        let forecastListController: ForecastListController = ForecastListController(datasource: datasource)
+        forecastListController.delegate = self
             
-        self.navigationController.viewControllers = [forecastsController]
+        self.navigationController.viewControllers = [forecastListController]
     }
 }
 
 
-extension ForecastsCoordinator: ForecastsControllerDelegate {
+extension ForecastsCoordinator: ForecastListControllerDelegate {
     func didSelect(model: Forecast) {
         let weatherCoordinator = WeatherCoordinator(navigationController: navigationController, datasource: datasource)
         weatherCoordinator.delegate = self
