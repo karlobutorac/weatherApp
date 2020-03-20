@@ -15,7 +15,7 @@ class WeatherCoordinator: Coordinator {
     var model: Forecast!
     weak var delegate: ForecastListControllerDelegate?
 
-    unowned let navigationController: UINavigationController
+    weak var navigationController: UINavigationController!
 
     
     required init(navigationController: UINavigationController, datasource: Datasource) {

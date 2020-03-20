@@ -13,7 +13,7 @@ class ForecastsCoordinator: Coordinator {
     var datasource: Datasource
     var childCoordinators: [Coordinator] = []
     
-    unowned let navigationController: UINavigationController
+    weak var navigationController: UINavigationController!
     
     required init(navigationController: UINavigationController, datasource: Datasource) {
         self.navigationController = navigationController

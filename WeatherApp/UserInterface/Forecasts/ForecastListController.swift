@@ -51,7 +51,11 @@ class ForecastListController: UIViewController {
         let results = searchController.searchBar.rx.text.orEmpty
             .throttle(RxTimeInterval.milliseconds(500), scheduler: MainScheduler.instance)
             .distinctUntilChanged()
-            .flatMapLatest { query -> Observable<[Forecast]> in
+            .flatMapLatest { [weak self] query -> Observable<[Forecast]> in
+                guard let self = self else {
+                    return Observable.empty()
+                }
+                
                 if query.isEmpty {
                     return self.forecastListViewModel.forecasts.asObservable()
                 }
@@ -72,7 +76,7 @@ class ForecastListController: UIViewController {
         collectionView.rx
             .itemSelected
             .withLatestFrom(tappedForecast)
-            .subscribe({ event in
+            .subscribe({ [weak self] event in
                 guard let indexPath = event.element?.1, let forecasts = event.element?.0  else {
                     return
                 }
@@ -83,8 +87,8 @@ class ForecastListController: UIViewController {
                 
                 let forecastCellViewModel = ForecastCellViewModel.init(forecast: forecasts[indexPath.row])
                 
-                self.animateTransition(for: indexPath, forecastCellViewModel: forecastCellViewModel) { _ in
-                    self.delegate?.didSelect(model: forecasts[indexPath.row])
+                self?.animateTransition(for: indexPath, forecastCellViewModel: forecastCellViewModel) { [weak self] _ in
+                    self?.delegate?.didSelect(model: forecasts[indexPath.row])
                 }
             }).disposed(by: disposeBag)
     }

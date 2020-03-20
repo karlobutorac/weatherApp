@@ -12,7 +12,6 @@ import RxCocoa
 import UIKit
 
 class WeatherForecastViewModel {
-    private let disposeBag = DisposeBag()
     private let datasource: Datasource
     private let cityId: Int
 

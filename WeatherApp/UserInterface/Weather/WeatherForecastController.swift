@@ -53,8 +53,8 @@ class WeatherForecastController: UIViewController {
     private func bindContent() {
     
         weatherForecastViewModel.colorScheme
-            .subscribe { colors in
-            self.view.layer.configureGradientBackground(colors: colors.element!)
+            .subscribe { [weak self] colors in
+            self?.view.layer.configureGradientBackground(colors: colors.element!)
         }.disposed(by: disposeBag)
         
         weatherForecastViewModel.name
@@ -78,12 +78,9 @@ class WeatherForecastController: UIViewController {
             .disposed(by: disposeBag)
         
         
-        dismissButton.rx.tap.bind { _ in
-            self.dismissButtonClicked()
+        dismissButton.rx.tap.bind { [weak self] _ in
+            self?.dismissButtonClicked()
         }.disposed(by: disposeBag)
-        
-        
-        
     }
     
     private func setupViews() {
