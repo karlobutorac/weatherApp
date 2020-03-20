@@ -55,7 +55,6 @@ class CoreDataDatasource {
         }
     }
     
-    
     func getAllForecasts() -> ForecastCoreDataResult<[ForecastCD]>{
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "ForecastCD")
         
@@ -107,5 +106,4 @@ class CoreDataDatasource {
     func getMyForecastsCount() -> Int {
         return getAllMyForecastsIds().count
     }
-    
 }

@@ -7,6 +7,8 @@
 //
 
 import Foundation
+import RxSwift
+import RxCocoa
 
 public enum DatabaseQueryResult<T> {
     case success(result: T)
@@ -14,9 +16,8 @@ public enum DatabaseQueryResult<T> {
 }
 
 protocol Datasource {
-    func getAllMyForecastsIds() -> [Int]
-    func getMyForecastsCount() -> Int
-    func getAllWeatherForecasts(completion: @escaping (DatabaseQueryResult<[Forecast]>) -> Void)
-    func getWeatherForecasts(for ids: [Int], completion: @escaping (DatabaseQueryResult<[Forecast]>) -> Void)
-    func getWeatherForecast(for id: Int, completion: @escaping (DatabaseQueryResult<Forecast>) -> Void)
+    func getAllWeatherForecastsObservable() -> Driver<DatabaseQueryResult<[Forecast]>>
+    func pullAllLatestWeatherForecasts()
+    func getWeatherForecastObservable(for id: Int) -> Driver<DatabaseQueryResult<Forecast>>
+    func pullLatestWeatherForecast(for id: Int)
 }

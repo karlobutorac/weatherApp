@@ -12,13 +12,25 @@ import RxSwift
 import RxCocoa
 
 class ForecastListViewModel {
+    private let disposeBag = DisposeBag()
     private let datasource: Datasource
     
     private let _forecasts = BehaviorRelay<[Forecast]>(value: [])
     
     init(datasource: Datasource) {
         self.datasource = datasource
-        self.fetchForecasts()
+        
+        datasource.getAllWeatherForecastsObservable().asObservable()
+            .bind(onNext: { [weak self] databaseQueryResult in
+                switch databaseQueryResult {
+                case .success(let forecasts):
+                    self?._forecasts.accept(forecasts)
+                case .failure(let error):
+                    print(error)
+                }
+        }).disposed(by: disposeBag)
+        
+        datasource.pullAllLatestWeatherForecasts()
     }
     
     var forecasts: Driver<[Forecast]> {
@@ -43,18 +55,5 @@ class ForecastListViewModel {
         }
         
         return _forecasts.value[index]
-    }
-    
-    func fetchForecasts() {
-        self._forecasts.accept([])
-        
-        datasource.getAllWeatherForecasts { datasouceQueryResult in
-            switch datasouceQueryResult {
-            case .success(let result):
-                self._forecasts.accept(result)
-            case .failure(let error):
-                print(error)
-            }
-        }
     }
 }
