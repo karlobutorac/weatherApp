@@ -7,86 +7,76 @@
 //
 
 import Foundation
-
+import RxSwift
+import RxCocoa
 
 class DatasourceManager: Datasource {
     public static let shared = DatasourceManager()
+    private let disposeBag = DisposeBag()
     
-    private init() {}
+    private let _allForecasts: BehaviorRelay<DatabaseQueryResult<[Forecast]>>
+    private var _allForecastsForId = [Int : BehaviorRelay<DatabaseQueryResult<Forecast>>]()
     
-    func getAllMyForecastsIds() -> [Int]  {
-        return CoreDataDatasource.shared.getAllMyForecastsIds()
-    }
-    
-    func getMyForecastsCount() -> Int {
-        return CoreDataDatasource.shared.getMyForecastsCount()
-    }
-    
-    func getWeatherForecasts(for ids: [Int], completion: @escaping (DatabaseQueryResult<[Forecast]>) -> Void) {
-        NetworkDatasource.shared.getWeatherDetails(for: ids) { forecastNetworkResult in
-            switch forecastNetworkResult {
-            case .success(let jsonForecasts):
-                
-                CoreDataDatasource.shared.saveForecasts(forecasts: Forecast.createArray(from: jsonForecasts))
-                completion(DatabaseQueryResult<[Forecast]>.success(result: Forecast.createArray(from: jsonForecasts)))
-                
+    private init() {
+        _allForecasts = BehaviorRelay<DatabaseQueryResult<[Forecast]>>(value: DatabaseQueryResult.success(result: []))
+        _allForecasts.asObservable().bind { [weak self] databaseQueryResult in
+            switch databaseQueryResult {
+            case .success(let result):
+                result.forEach({self?._allForecastsForId[$0.id] = BehaviorRelay<DatabaseQueryResult<Forecast>>.init(value: DatabaseQueryResult.success(result: $0))})
             case .failure(let error):
-                let coreDataResult = CoreDataDatasource.shared.getAllForecasts()
-                
-                if case .success(let coreDataForecasts) = coreDataResult, coreDataForecasts.count != 0 {
-                    completion(DatabaseQueryResult.success(result: Forecast.createArray(from: coreDataForecasts)))
-                    return
-                } else {
-                    completion(DatabaseQueryResult.failure(error: error))
-                }
+                print(error)
             }
-        }
-    }
-    
-    func getAllWeatherForecasts(completion: @escaping (DatabaseQueryResult<[Forecast]>) -> Void) {
-        NetworkDatasource.shared.getWeatherDetails(for: getAllMyForecastsIds()) { forecastNetworkResult in
-            switch forecastNetworkResult {
-            case .success(let jsonForecasts):
-                
-                CoreDataDatasource.shared.saveForecasts(forecasts: Forecast.createArray(from: jsonForecasts))
-                completion(DatabaseQueryResult<[Forecast]>.success(result: Forecast.createArray(from: jsonForecasts)))
-                
-            case .failure(let error):
-                let coreDataResult = CoreDataDatasource.shared.getAllForecasts()
-                
-                if case .success(let coreDataForecasts) = coreDataResult, coreDataForecasts.count != 0 {
-                    completion(DatabaseQueryResult.success(result: Forecast.createArray(from: coreDataForecasts)))
-                    return
-                } else {
-                    completion(DatabaseQueryResult.failure(error: error))
-                }
-            }
-        }
-    }
-    
-    func getWeatherForecast(for id: Int, completion: @escaping (DatabaseQueryResult<Forecast>) -> Void) {
-        let coreDataResult = CoreDataDatasource.shared.getForecast(for: id)
+        }.disposed(by: disposeBag)
         
-        if case .success(let coreDataForecasts) = coreDataResult{
-            completion(DatabaseQueryResult.success(result: Forecast.init(coreDataForecast: coreDataForecasts)))
-            return
-        } else {
+        switch CoreDataDatasource.shared.getAllForecasts() {
+        case .success(let coreDataForecasts):
+            _allForecasts.accept(DatabaseQueryResult.success(result: Forecast.createArray(from: coreDataForecasts)))
+        case .failure(let error):
+            _allForecasts.accept(DatabaseQueryResult.failure(error: error))
+        }
+    }
+    
+    func getAllWeatherForecastsObservable() -> Driver<DatabaseQueryResult<[Forecast]>> {
+        return _allForecasts.asDriver()
+    }
+    
+    func getWeatherForecastObservable(for id: Int) -> Driver<DatabaseQueryResult<Forecast>> {
+        guard let forecast = _allForecastsForId[id] else {
+            let noSuchElement = BehaviorRelay<DatabaseQueryResult<Forecast>>.init(value: DatabaseQueryResult.failure(error: "No such element"))
+            _allForecastsForId[id] = noSuchElement
+            return noSuchElement.asDriver()
+        }
+        
+        return forecast.asDriver()
+    }
+    
+    func pullLatestWeatherForecast(for id: Int) {
+        NetworkDatasource.shared.getWeatherDetails(for: CoreDataDatasource.shared.getAllMyForecastsIds()) { [weak self] forecastNetworkResult in
+            guard let self = self else {
+                return
+            }
             
-            
-            NetworkDatasource.shared.getWeatherDetails(for: [id]) { forecastNetworkResult in
-                switch forecastNetworkResult {
-                case .success(let jsonForecast):
-                    
-                    if jsonForecast.count != 1 {
-                        completion(DatabaseQueryResult.failure(error: "Invalid number of forecasts!"))
-                    }
-                    
-                    completion(DatabaseQueryResult<Forecast>.success(result: Forecast.init(jsonForecast: jsonForecast[0])))
-                    
-                case .failure(let error):
-                    completion(DatabaseQueryResult.failure(error: error))
-                    
+            switch forecastNetworkResult {
+            case .success(let jsonForecasts):
+                if jsonForecasts.count != 1 {
+                   self._allForecasts.accept(DatabaseQueryResult<[Forecast]>.failure(error: "Recieved invalid number of elements"))
                 }
+                
+                self._allForecastsForId[jsonForecasts[0].id]?.accept(DatabaseQueryResult.success(result: Forecast.init(jsonForecast: jsonForecasts[0])))
+                
+            case .failure(let error):
+                self._allForecasts.accept(DatabaseQueryResult<[Forecast]>.failure(error: error))
+            }
+        }
+    }
+    
+    func pullAllLatestWeatherForecasts(){
+        NetworkDatasource.shared.getWeatherDetails(for: CoreDataDatasource.shared.getAllMyForecastsIds()) { [weak self] forecastNetworkResult in
+            switch forecastNetworkResult {
+            case .success(let jsonForecasts):
+                self?._allForecasts.accept(DatabaseQueryResult<[Forecast]>.success(result: Forecast.createArray(from: jsonForecasts)))
+            case .failure(let error):
+                self?._allForecasts.accept(DatabaseQueryResult<[Forecast]>.failure(error: error))
             }
         }
     }

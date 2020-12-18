@@ -22,12 +22,10 @@ class DetailsCell: UICollectionViewCell {
     }
     
     public func setupCell(detailsModel: DetailsCellViewModel) {
-        
         image.image = detailsModel.image
         titleLabel.text = detailsModel.title
         valueLabel.text = detailsModel.value
     }
-    
     
     private func setupViews() {
         setupCellCorners()
@@ -52,14 +50,12 @@ class DetailsCell: UICollectionViewCell {
         valueLabel.rightAnchor.constraint(equalTo: rightAnchor, constant: -10).isActive = true
     }
     
-    
     private func setupCellCorners() {
         self.layer.cornerRadius = 10
         
         self.layer.shadowColor = UIColor.black.cgColor
         self.layer.masksToBounds = true
     }
-    
     
     let image: UIImageView = {
         let iv = UIImageView()

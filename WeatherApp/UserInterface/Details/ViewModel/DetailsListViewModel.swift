@@ -12,9 +12,9 @@ import RxSwift
 import RxCocoa
 
 class DetailsListViewModel {
+    private let disposeBag = DisposeBag()
     private let datasource: Datasource
     private let cityId: Int
-    
 
     private let _details: BehaviorRelay<[Details]>!
 
@@ -32,19 +32,18 @@ class DetailsListViewModel {
     var numberOfDetails: Int {
         return _details.value.count
     }
-
     
     func updateDetails() {
-        datasource.getWeatherForecast(for: cityId) { datasouceQueryResult in
-            switch datasouceQueryResult {
-            case .success(let result):
-                self._details.accept(DetailsListViewModel.initializeModel(from: result))
-            case .failure(let error):
-                print(error)
-            }
-        }
+        datasource.getWeatherForecastObservable(for: cityId).asObservable()
+            .bind(onNext: { [weak self] databaseQueryResult in
+                switch databaseQueryResult {
+                case .success(let result):
+                    self?._details.accept(DetailsListViewModel.initializeModel(from: result))
+                case .failure(let error):
+                    print(error)
+                }
+            }).disposed(by: disposeBag)
     }
-    
     
     private static func initializeModel(from forecast: Forecast) -> [Details] {
         var details = [Details]()

@@ -24,8 +24,11 @@ extension ForecastListController: AnimatedTransition {
          let transitionFrame = CGRect(x: cellCopy.frame.minX, y: cellCopy.frame.minY + (self.navigationController?.viewControllers[0].view.frame.minY)!, width: cellCopy.frame.width, height: cellCopy.frame.height)
          let expandedFrame = CGRect(x: 0 , y: 0, width: self.navigationController!.view.frame.width , height: self.navigationController!.view.frame.height)
 
-        self.animateTransition(of: cellCopy, with: forecastCellViewModel, to: shrinkedFrame, inside: collectionView, duration: 0.2) { _ in
-
+        self.animateTransition(of: cellCopy, with: forecastCellViewModel, to: shrinkedFrame, inside: collectionView, duration: 0.2) { [weak self] _ in
+            guard let self = self else {
+                return
+            }
+            
              if cellCopy.hasTopNotch {
                  cellCopy.nameLabelTopAchor?.constant = CGFloat(Int(cellCopy.nameLabelTopAchor!.constant) +  24) //magic number treba rjesit
              }

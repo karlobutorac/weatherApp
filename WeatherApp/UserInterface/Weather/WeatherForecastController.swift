@@ -203,7 +203,6 @@ class WeatherForecastController: UIViewController {
         return view
     }()
     
-
     lazy var detailCollectionView: UIViewController =  {
         let details = DetailsCollectionViewController(datasource: datasource, cityId: cityId, forecast: weatherForecastViewModel.forecast.value)
         details.view.backgroundColor = .clear

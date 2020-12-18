@@ -12,10 +12,10 @@ import RxCocoa
 import UIKit
 
 class WeatherForecastViewModel {
+    private let disposeBag = DisposeBag()
     private let datasource: Datasource
     private let cityId: Int
 
-    
     init (datasource: Datasource, cityId: Int, forecast: Forecast) {
         self.datasource = datasource
         self.cityId = cityId
@@ -26,7 +26,6 @@ class WeatherForecastViewModel {
         self.minTemp = BehaviorSubject<String>.init(value: "\(forecast.minTemp)°")
         self.maxTemp = BehaviorSubject<String>.init(value: "\(forecast.maxTemp)°")
     }
-    
 
     var forecast: BehaviorRelay<Forecast>
     var name: BehaviorSubject<String>
@@ -38,18 +37,18 @@ class WeatherForecastViewModel {
         return BehaviorSubject.init(value: UIColor.getColorScheme(for: cityId))
     }
     
-    
-    func update() {
-        datasource.getWeatherForecast(for: cityId) { databaseQueryResult in
-            switch databaseQueryResult {
-            case .success(let result):
-                self.name.onNext(result.name)
-                self.currentTemp.onNext("\(result.currentTemp)°")
-                self.minTemp.onNext("\(result.minTemp)°")
-                self.maxTemp.onNext("\(result.maxTemp)°")
-            case .failure(let error):
-                print(error)
-            }
-        }
+    func updateDetails() {
+        datasource.getWeatherForecastObservable(for: cityId).asObservable()
+            .bind(onNext: { [weak self] databaseQueryResult in
+                switch databaseQueryResult {
+                case .success(let result):
+                    self?.name.onNext(result.name)
+                    self?.currentTemp.onNext("\(result.currentTemp)°")
+                    self?.minTemp.onNext("\(result.minTemp)°")
+                    self?.maxTemp.onNext("\(result.maxTemp)°")
+                case .failure(let error):
+                    print(error)
+                }
+            }).disposed(by: disposeBag)
     }
 }
